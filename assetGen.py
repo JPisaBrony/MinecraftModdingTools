@@ -21,12 +21,34 @@ if __name__ == '__main__':
     main_path_modid = MAIN_PATH + ID
     if os.path.exists(main_path_modid):
         if args.type == "item":
-            itemJson = {}
-            itemJson["parent"] = "item/generated"
-            itemJson["textures"] = { "layer0": ID + ":item/" + name }
-            new_item_path = main_path_modid + "/models/item/" + name + ".json"
-            with open(new_item_path, 'w') as file:
-                file.write(json.dumps(itemJson))
+            if delete == True:
+                new_item_path = main_path_modid + "/models/item/" + name + ".json"
+                if os.path.isfile(new_item_path):
+                    os.remove(new_item_path)
+                
+                png = main_path_modid + "/textures/item/" + name + ".png"
+                if os.path.isfile(png):
+                    os.remove(png)
+            else:
+                itemJson = {}
+                itemJson["parent"] = "item/generated"
+                itemJson["textures"] = { "layer0": ID + ":item/" + name }
+                new_item_path = main_path_modid + "/models/item/" + name + ".json"
+                if not os.path.isfile(new_item_path) or override:
+                    with open(new_item_path, 'w') as file:
+                        file.write(json.dumps(itemJson))
+                else:
+                    print new_item_path + OVERRIDE_MSG
+                
+                png = name + ".png"
+                png_loc = main_path_modid + "/textures/item/" + png
+                if not os.path.isfile(png_loc) or override:
+                    if os.path.isfile(png):
+                        os.rename(png, png_loc)
+                    else:
+                        print "creating json files without image in textures/block"
+                else:
+                    print png_loc + OVERRIDE_MSG
         elif args.type == "block":
             if delete == True:
                 bState = main_path_modid + "/blockstates/" + name + ".json"
